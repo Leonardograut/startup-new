@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>EstudaEasy</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+  <!-- LANDING -->
+
+  <section class="landing">
+
+    <div class="container">
+
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/4712/4712105.png"
+        class="landing-logo"
+      >
+
+      <h1 class="display-4 fw-bold">
+        EstudaEasy
+      </h1>
+
+      <p class="lead">
+        Seu tutor inteligente para aprender qualquer matéria.
+      </p>
+
+      <a href="/chat" class="btn btn-light btn-lg mt-3">
+        Começar a estudar
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- PREVIEW DO CHAT -->
+
+  <section class="container py-5">
+
+    <h2 class="text-center mb-4">
+      Veja como funciona
+    </h2>
+
+    <div class="chat-preview p-4">
+
+      <div class="chat-bubble user">
+        O que é fotossíntese?
+      </div>
+
+      <div class="chat-bubble bot" id="aiText">
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- RECURSOS -->
+
+  <section class="container py-5">
+
+    <div class="row text-center">
+
+      <div class="col-md-4">
+
+        <h4>📚 Explicações</h4>
+
+        <p>
+          Receba explicações claras
+          sobre qualquer matéria.
+        </p>
+
+      </div>
+
+      <div class="col-md-4">
+
+        <h4>🧠 Resumos</h4>
+
+        <p>
+          Transforme textos longos
+          em resumos fáceis.
+        </p>
+
+      </div>
+
+      <div class="col-md-4">
+
+        <h4>📝 Exercícios</h4>
+
+        <p>
+          Pratique com exercícios
+          gerados automaticamente.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- CTA FINAL -->
+
+  <section class="text-center py-5">
+
+    <h2>
+      Pronto para aprender?
+    </h2>
+
+    <a href="/chat" class="btn btn-primary btn-lg mt-3">
+      Abrir Chat
+    </a>
+
+  </section>
+
+
+  <!-- FOOTER -->
+
+  <footer class="text-center p-4">
+
+    EstudaEasy © 2026
+
+  </footer>
+
+
+  <script>
+
+    const text =
+      "A fotossíntese é o processo em que as plantas transformam luz solar em energia química.";
+
+    let index = 0;
+
+    function typeEffect() {
+
+      if (index < text.length) {
+
+        document.getElementById("aiText").innerHTML += text.charAt(index);
+
+        index++;
+
+        setTimeout(typeEffect, 25);
+
+      }
+
+    }
+
+    typeEffect();
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>🤖 EstudaEasy - Tutor Inteligente</title>
+
+  <!-- CSS externo -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Bibliotecas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+</head>
+
+<body>
+
+
+  </section>
+
+
+  <!-- CHAT -->
+
+  <section id="chat-section">
+
+    <div class="main-container">
+
+      <!-- SIDEBAR -->
+
+      <div class="sidebar">
+
+        <div class="avatar">
+
+          <img src="https://cdn-icons-png.flaticon.com/512/4712/4712105.png">
+
+          <h3>EstudaEasy</h3>
+
+          <p class="welcome">
+            👋 Olá! Seja bem-vindo ao <b>EstudaEasy</b>.
+            Eu sou seu assistente educacional inteligente.
+            Posso explicar conteúdos, gerar resumos, criar exercícios
+            e ajudar você a aprender de forma mais simples.
+          </p>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="actions">
+
+          <button onclick="sendQuick('Faça um resumo dessa pergunta')">
+            <i class="fa-solid fa-book-open"></i> Resumir
+          </button>
+
+          <button onclick="sendQuick('Explique passo a passo')">
+            <i class="fa-solid fa-brain"></i> Explicar Passos
+          </button>
+
+          <button onclick="sendQuick('Liste as principais fontes dessa pesquisa')">
+            <i class="fa-solid fa-magnifying-glass"></i> Fontes
+          </button>
+
+          <button onclick="sendQuick('Dê exemplos práticos sobre o tema')">
+            <i class="fa-solid fa-lightbulb"></i> Exemplos
+          </button>
+
+          <button onclick="sendQuick('Traduza para linguagem simples')">
+            <i class="fa-solid fa-language"></i> Simplificar
+          </button>
+
+          <button onclick="sendQuick('Crie um resumo técnico sobre o assunto')">
+            <i class="fa-solid fa-file-lines"></i> Resumo Técnico
+          </button>
+
+          <button onclick="sendQuick('Explique como um professor ensinando um aluno iniciante')">
+            <i class="fa-solid fa-chalkboard-user"></i> Explicar como Professor
+          </button>
+
+          <button onclick="sendQuick('Crie 5 exercícios sobre esse tema')">
+            <i class="fa-solid fa-pencil"></i> Criar Exercícios
+          </button>
+
+          <button onclick="sendQuick('Crie um pequeno quiz com perguntas e respostas')">
+            <i class="fa-solid fa-question"></i> Criar Quiz
+          </button>
+
+          <button onclick="sendQuick('Mostre um mapa mental sobre o assunto')">
+            <i class="fa-solid fa-diagram-project"></i> Mapa Mental
+          </button>
+
+          <button onclick="sendQuick('Compare esse tema com outros conceitos relacionados')">
+            <i class="fa-solid fa-scale-balanced"></i> Comparar Conceitos
+          </button>
+
+          <button onclick="sendQuick('Crie um plano de estudo sobre esse assunto')">
+            <i class="fa-solid fa-calendar"></i> Plano de Estudo
+          </button>
+
+          <button onclick="sendQuick('Liste as palavras chave importantes sobre esse tema')">
+            <i class="fa-solid fa-key"></i> Palavras-chave
+          </button>
+
+          <button onclick="sendQuick('Explique usando analogias simples')">
+            <i class="fa-solid fa-puzzle-piece"></i> Analogias
+          </button>
+
+          <button onclick="sendQuick('Resolva esse problema passo a passo')">
+            <i class="fa-solid fa-calculator"></i> Resolver Problema
+          </button>
+
+          <button onclick="gerarPDF()">
+            <i class="fa-solid fa-file-pdf"></i> Gerar PDF
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- CHAT CONTAINER -->
+
+      <div class="chat-container">
+
+        <div class="chat-header">
+          💬 EstudaEasy - Seu Assistente Inteligente
+        </div>
+
+        <div id="messages" class="chat-messages"></div>
+
+        <div class="chat-input">
+
+          <input
+            id="input"
+            type="text"
+            placeholder="Digite sua mensagem..."
+            onkeydown="if(event.key==='Enter') sendMessage()"
+          >
+
+          <button onclick="sendMessage()">
+            Enviar
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+<script>
+
+const messagesDiv = document.getElementById("messages");
+const input = document.getElementById("input");
+
+let history = [];
+
+
+/* adicionar mensagem no chat */
+
+function append(role, text) {
+
+  const wrapper = document.createElement("div");
+  wrapper.className = `message-wrapper ${role}`;
+
+  const avatar = document.createElement("img");
+
+  if (role === "bot") {
+    avatar.src = "https://cdn-icons-png.flaticon.com/512/4712/4712105.png";
+  } else {
+    avatar.src = "https://cdn-icons-png.flaticon.com/512/9131/9131529.png";
+  }
+
+  avatar.className = "chat-avatar";
+
+
+  const div = document.createElement("div");
+  div.className = `chat-bubble ${role}`;
+
+  if (role === "bot") {
+
+    div.innerHTML = marked.parse(text);
+
+    const speakBtn = document.createElement("button");
+    speakBtn.className = "speak-btn";
+    speakBtn.innerHTML = "🔊 Ouvir";
+
+    speakBtn.onclick = () => falarTexto(text);
+
+    div.appendChild(document.createElement("br"));
+    div.appendChild(speakBtn);
+
+  } else {
+    div.innerText = text;
+  }
+
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(div);
+
+  messagesDiv.appendChild(wrapper);
+
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+}
+
+
+/* enviar mensagem */
+
+async function sendMessage(customText){
+
+  const text = customText || input.value.trim();
+
+  if(!text) return;
+
+  append("user", text);
+
+  input.value = "";
+
+  history.push({
+    role:"user",
+    content:text
+  });
+
+
+  const loading = document.createElement("div");
+
+  loading.className = "chat-bubble bot";
+  loading.innerText = "💭 Pensando...";
+
+  messagesDiv.appendChild(loading);
+
+
+  const response = await fetch("/chat",{
+
+    method:"POST",
+
+    headers:{
+      "Content-Type":"application/json"
+    },
+
+    body:JSON.stringify({
+      messages:history
+    })
+
+  });
+
+
+  const data = await response.json();
+
+  messagesDiv.removeChild(loading);
+
+  append("bot", data.reply);
+
+  history.push({
+    role:"assistant",
+    content:data.reply
+  });
+
+}
+
+
+/* enviar ação rápida */
+
+function sendQuick(text){
+
+  sendMessage(text);
+
+}
+
+
+
+/* gerar PDF da conversa */
+
+function gerarPDF(){
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF();
+
+  let y = 20;
+
+  doc.setFontSize(20);
+
+  doc.text("EstudaEasy - Material de Estudo",105,y,{align:"center"});
+
+  y += 10;
+
+  doc.setFontSize(10);
+
+  const data = new Date().toLocaleDateString("pt-BR");
+
+  doc.text("Gerado em: "+data,105,y,{align:"center"});
+
+  y += 20;
+
+  const bubbles = document.querySelectorAll(".chat-bubble");
+
+  doc.setFontSize(12);
+
+  bubbles.forEach((b)=>{
+
+    let texto = b.innerText
+      .normalize("NFKD")
+      .replace(/[^\x00-\x7F]/g,"");
+
+    let titulo = "";
+
+    if(b.classList.contains("user")){
+      titulo = "Pergunta:";
+    }else{
+      titulo = "Resposta:";
+    }
+
+    doc.setFont(undefined,"bold");
+    doc.text(titulo,10,y);
+
+    y += 6;
+
+    doc.setFont(undefined,"normal");
+
+    const linhas = doc.splitTextToSize(texto,180);
+
+    linhas.forEach((linha)=>{
+
+      if(y > 280){
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.text(linha,10,y);
+
+      y += 6;
+
+    });
+
+    y += 10;
+
+  });
+
+  doc.save("estudaeasy-material.pdf");
+
+}
+
+function falarTexto(texto) {
+
+  // remover markdown
+  let textoLimpo = texto
+    .replace(/\*\*/g, "")   // remove **
+    .replace(/\*/g, "")     // remove *
+    .replace(/#/g, "")      // remove #
+    .replace(/`/g, "")      // remove `
+    .replace(/>/g, "")      // remove >
+    .replace(/\n/g, " ");   // quebra de linha vira espaço
+
+  const speech = new SpeechSynthesisUtterance(textoLimpo);
+
+  speech.lang = "pt-BR";
+  speech.rate = 1;
+  speech.pitch = 1;
+
+  window.speechSynthesis.speak(speech);
+}
+
+</script>
+
+</body>
+</html>
