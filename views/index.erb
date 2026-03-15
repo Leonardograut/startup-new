@@ -25,6 +25,42 @@
 <body>
 
 
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container">
+
+    <a class="navbar-brand fw-bold" href="/">
+      🤖 EstudaEasy
+    </a>
+
+    <div class="ms-auto">
+
+      <% if session[:user_id] %>
+
+        <span class="text-white me-3">
+          <i class="fa-solid fa-user"></i>
+          <%= @current_user["name"] %>
+        </span>
+
+        <a href="/logout" class="btn btn-danger">
+          Sair
+        </a>
+
+      <% else %>
+
+        <a href="/login" class="btn btn-outline-light me-2">
+          <i class="fa-solid fa-user"></i>
+          Login
+        </a>
+
+      <% end %>
+
+    </div>
+
+  </div>
+</nav>
+
+<br><br>
+
   </section>
 
 
@@ -78,16 +114,8 @@
             <i class="fa-solid fa-language"></i> Simplificar
           </button>
 
-          <button onclick="sendQuick('Crie um resumo técnico sobre o assunto')">
-            <i class="fa-solid fa-file-lines"></i> Resumo Técnico
-          </button>
-
           <button onclick="sendQuick('Explique como um professor ensinando um aluno iniciante')">
             <i class="fa-solid fa-chalkboard-user"></i> Explicar como Professor
-          </button>
-
-          <button onclick="sendQuick('Crie 5 exercícios sobre esse tema')">
-            <i class="fa-solid fa-pencil"></i> Criar Exercícios
           </button>
 
           <button onclick="sendQuick('Crie um pequeno quiz com perguntas e respostas')">
@@ -112,10 +140,6 @@
 
           <button onclick="sendQuick('Explique usando analogias simples')">
             <i class="fa-solid fa-puzzle-piece"></i> Analogias
-          </button>
-
-          <button onclick="sendQuick('Resolva esse problema passo a passo')">
-            <i class="fa-solid fa-calculator"></i> Resolver Problema
           </button>
 
           <button onclick="gerarPDF()">
@@ -158,15 +182,12 @@
 
   </section>
 
-
-
 <script>
 
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("input");
 
 let history = [];
-
 
 /* adicionar mensagem no chat */
 
@@ -215,7 +236,6 @@ function append(role, text) {
 
 }
 
-
 /* enviar mensagem */
 
 async function sendMessage(customText){
@@ -233,14 +253,11 @@ async function sendMessage(customText){
     content:text
   });
 
-
   const loading = document.createElement("div");
 
   loading.className = "chat-bubble bot";
   loading.innerText = "💭 Pensando...";
-
   messagesDiv.appendChild(loading);
-
 
   const response = await fetch("/chat",{
 
@@ -256,7 +273,6 @@ async function sendMessage(customText){
 
   });
 
-
   const data = await response.json();
 
   messagesDiv.removeChild(loading);
@@ -270,7 +286,6 @@ async function sendMessage(customText){
 
 }
 
-
 /* enviar ação rápida */
 
 function sendQuick(text){
@@ -278,8 +293,6 @@ function sendQuick(text){
   sendMessage(text);
 
 }
-
-
 
 /* gerar PDF da conversa */
 
@@ -372,6 +385,56 @@ function falarTexto(texto) {
 
   window.speechSynthesis.speak(speech);
 }
+
+
+async function loadHistory(){
+
+  const response = await fetch("/history")
+
+  const data = await response.json()
+
+  history = data.messages
+
+  history.forEach(m => {
+
+    if(m.role === "assistant"){
+      append("bot", m.content)
+    }else{
+      append("user", m.content)
+    }
+
+  })
+
+}
+
+async function loadConversations(){
+
+  const response = await fetch("/conversations")
+
+  const data = await response.json()
+
+  const list = document.getElementById("historyList")
+
+  list.innerHTML = ""
+
+  data.conversations.forEach(c => {
+
+    const li = document.createElement("li")
+
+    li.innerText = c.title
+
+    li.onclick = () => loadConversation(c.id)
+
+    list.appendChild(li)
+
+  })
+
+}
+
+
+
+loadHistory()
+
 
 </script>
 
