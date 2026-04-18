@@ -1,3 +1,9 @@
+require "net/http"
+require "json"
+require "uri"
+
+enable :sessions
+
 get "/history" do
   content_type :json
 
@@ -28,44 +34,58 @@ post "/chat" do
   data = JSON.parse(request.body.read)
   messages = data["messages"] || []
 
-  prompt = <<~PROMPT
-  Você é um tutor educacional chamado EstudaEasy.
+  # 🔹 System prompt (suas regras)
+  api_messages = [
+    {
+      role: "system",
+      content: <<~PROMPT
+      Você é um tutor educacional chamado EstudaEasy.
 
-  Regras obrigatórias:
+      Regras obrigatórias:
 
-  - Responda sempre em português do Brasil.
-  - Use parágrafos longos e bem desenvolvidos.
-  - Evite respostas curtas ou superficiais.
-  - NÃO escreva seções chamadas "Em resumo", "Resumo" ou "Resumindo".
-  - Só faça resumo se o usuário pedir explicitamente.
-
-  PROMPT
+      - Responda sempre em português do Brasil.
+      - Use parágrafos longos e bem desenvolvidos.
+      - Evite respostas curtas ou superficiais.
+      - NÃO escreva "Em resumo", "Resumo" ou "Resumindo".
+      - Só faça resumo se o usuário pedir explicitamente.
+      PROMPT
+    }
+  ]
 
   messages.each do |m|
-    role = m["role"] == "user" ? "Usuário" : "Assistente"
-    prompt << "#{role}: #{m['content']}\n"
+    api_messages << {
+      role: m["role"], 
+      content: m["content"]
+    }
   end
 
-  prompt << "Assistente:"
+  uri = URI("https://api.groq.com/openai/v1/chat/completions")
 
-  uri = URI(OLLAMA_URL)
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
 
-  body = {
-    model: "gemma3:1b",
-    prompt: prompt,
-    stream: false,
-    options: {
-      temperature: 0.4,
-      top_p: 0.9,
-      num_predict: 500
-    }
+  request = Net::HTTP::Post.new(uri.path, {
+    "Content-Type" => "application/json",
+    "Authorization" => "Bearer #{ENV['API_KEY']}"
+  })
+
+  request.body = {
+    model: "llama-3.1-8b-instant",
+    messages: api_messages,
+    temperature: 0.4
   }.to_json
 
-  response = Net::HTTP.post(uri, body, "Content-Type" => "application/json")
+  response = http.request(request)
+
+  if response.code != "200"
+    return { reply: "Erro na API: #{response.code}" }.to_json
+  end
+
   json = JSON.parse(response.body)
 
-  reply = json["response"] || "Erro ao gerar resposta."
+  reply = json.dig("choices", 0, "message", "content") || "Erro ao gerar resposta."
 
+  # 🔹 limpeza opcional
   reply = reply.gsub(/Em resumo:?.*/i, "")
   reply = reply.gsub(/Resumindo:?.*/i, "")
   reply = reply.strip
