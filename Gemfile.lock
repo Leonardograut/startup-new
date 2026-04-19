@@ -41,6 +41,7 @@ DEPENDENCIES
   json
   pg
   puma
+  rack
   rackup
   sinatra
 
