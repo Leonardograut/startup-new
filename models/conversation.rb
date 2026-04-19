@@ -1,15 +1,10 @@
 class Conversation
 
   def self.list(user_id)
-
-    stmt = DB.prepare("
-      SELECT id,title
-      FROM conversations
-      WHERE user_id = ?
-      ORDER BY id DESC
-    ")
-
-    result = stmt.execute(user_id)
+    result = DB.exec_params(
+      "SELECT id, title FROM conversations WHERE user_id = $1 ORDER BY id DESC",
+      [user_id]
+    )
 
     result.map do |c|
       {
@@ -17,7 +12,6 @@ class Conversation
         title: c["title"]
       }
     end
-
   end
 
 end

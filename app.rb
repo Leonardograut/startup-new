@@ -10,7 +10,9 @@ enable :sessions
 
 require_relative "./config/database"
 
-set :bind, "0.0.0.0"
+#set :bind, "0.0.0.0"
+
+set :bind, ENV["APP_HOST"]
 set :port, ENV["PORT"] || 4567
 
 OLLAMA_URL = ENV["API_URL"]

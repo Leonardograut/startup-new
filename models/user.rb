@@ -1,29 +1,33 @@
 require_relative "../config/database"
 
 class User
-
+  
   def self.find(id)
-    
-    stmt = DB.prepare("SELECT * FROM users WHERE id = ?")
-    result = stmt.execute(id)
-    
+    result = DB.exec_params(
+      "SELECT * FROM users WHERE id = $1",
+      [id]
+    )
+
     result.first
   end
 
   def self.find_by_email(email)
-    
-    stmt = DB.prepare("SELECT * FROM users WHERE email = ?")
-    result = stmt.execute(email)
-    
+    result = DB.exec_params(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    )
+
     result.first
   end
 
-  def self.create(name,email,password)
-    
-    stmt = DB.prepare("INSERT INTO users (name,email,password) VALUES (?,?,?)")
-    stmt.execute(name,email,password)
-    
-    DB.last_id
+  def self.create(name, email, password)
+    result = DB.exec_params(
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id",
+      [name, email, password]
+    )
+
+    result[0]["id"]
   end
+
 
 end

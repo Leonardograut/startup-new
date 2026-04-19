@@ -30,11 +30,20 @@ end
 
 post "/chat" do
   content_type :json
+  
+  user_id = session[:user_id]
+
+  unless user_id
+    return { reply: "Usuário não autenticado." }.to_json
+  end
 
   data = JSON.parse(request.body.read)
   messages = data["messages"] || []
 
-  # 🔹 System prompt (suas regras)
+  user_message = messages.last["content"]
+
+  Message.save(user_id, "user", user_message)
+
   api_messages = [
     {
       role: "system",
@@ -78,17 +87,20 @@ post "/chat" do
   response = http.request(request)
 
   if response.code != "200"
-    return { reply: "Erro na API: #{response.code}" }.to_json
+    error_msg = "Erro na API: #{response.code}"
+    Message.save(user_id, "assistant", error_msg) 
+    return { reply: error_msg }.to_json
   end
 
   json = JSON.parse(response.body)
 
   reply = json.dig("choices", 0, "message", "content") || "Erro ao gerar resposta."
 
-  # 🔹 limpeza opcional
   reply = reply.gsub(/Em resumo:?.*/i, "")
   reply = reply.gsub(/Resumindo:?.*/i, "")
   reply = reply.strip
+
+  Message.save(user_id, "assistant", reply)
 
   { reply: reply }.to_json
 end
