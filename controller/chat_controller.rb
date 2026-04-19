@@ -33,10 +33,6 @@ post "/chat" do
   
   user_id = session[:user_id]
 
-  unless user_id
-    return { reply: "Usuário não autenticado." }.to_json
-  end
-
   data = JSON.parse(request.body.read)
   messages = data["messages"] || []
 
