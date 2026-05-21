@@ -7,9 +7,9 @@ post "/register" do
   email = params[:email]
   password = params[:password]
 
-  user_id = User.create(name, email, password)
+  user = User.create(name: name, email: email, password: password)
 
-  session[:user_id] = user_id
+  session[:user_id] = user.id
 
   redirect "/"
 
@@ -19,9 +19,9 @@ post "/login" do
 
   user = User.find_by_email(params[:email])
 
-  if user && user["password"] == params[:password]
+  if user && user.password == params[:password]
 
-    session[:user_id] = user["id"]
+    session[:user_id] = user.id
 
     redirect "/"
 

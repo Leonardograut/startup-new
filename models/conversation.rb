@@ -1,17 +1,11 @@
-class Conversation
+﻿class Conversation < ActiveRecord::Base
+  belongs_to :user
+  has_many :messages, dependent: :destroy
 
   def self.list(user_id)
-    result = DB.exec_params(
-      "SELECT id, title FROM conversations WHERE user_id = $1 ORDER BY id DESC",
-      [user_id]
-    )
-
-    result.map do |c|
-      {
-        id: c["id"],
-        title: c["title"]
-      }
-    end
+    where(user_id: user_id)
+      .order(id: :desc)
+      .pluck(:id, :title)
+      .map { |id, title| { id: id, title: title } }
   end
-
 end

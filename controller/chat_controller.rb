@@ -38,7 +38,7 @@ post "/chat" do
 
   user_message = messages.last["content"]
 
-  Message.save(user_id, "user", user_message)
+  Message.create_message(user_id, "user", user_message)
 
   api_messages = [
     {
@@ -84,7 +84,7 @@ post "/chat" do
 
   if response.code != "200"
     error_msg = "Erro na API: #{response.code}"
-    Message.save(user_id, "assistant", error_msg) 
+    Message.create_message(user_id, "assistant", error_msg)
     return { reply: error_msg }.to_json
   end
 
@@ -96,7 +96,7 @@ post "/chat" do
   reply = reply.gsub(/Resumindo:?.*/i, "")
   reply = reply.strip
 
-  Message.save(user_id, "assistant", reply)
+  Message.create_message(user_id, "assistant", reply)
 
   { reply: reply }.to_json
 end
