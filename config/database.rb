@@ -1,4 +1,3 @@
-require "pg"
+﻿require "sinatra/activerecord"
 require "dotenv/load"
-
-DB = PG.connect(ENV["DATABASE_URL"])
+set :database_file, "config/database.yml"
