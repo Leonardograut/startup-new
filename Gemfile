@@ -1,9 +1,12 @@
 source "https://rubygems.org"
 
 gem "sinatra"
+gem "sinatra-activerecord"
+gem "activerecord", "~> 7.1"
+gem "pg"
+gem "rake"
 gem "json"
 gem "rackup"
 gem "puma"
 gem "dotenv"
-gem "pg"
 gem "rack"
